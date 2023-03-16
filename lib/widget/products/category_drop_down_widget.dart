@@ -1,23 +1,25 @@
-import 'package:dynamic_form/constants.dart';
-import 'package:dynamic_form/model/categiories.dart';
 import 'package:flutter/material.dart';
 
+import '../../constants.dart';
+
+import '../../model/form_category.dart';
+
 class CategoryDropDownWidget extends StatefulWidget {
-  const CategoryDropDownWidget({super.key});
+  const CategoryDropDownWidget({super.key, required this.onChanged});
+  final ValueChanged<FormCategory> onChanged;
 
   @override
   State<CategoryDropDownWidget> createState() => _CategoryDropDownWidgetState();
 }
 
 class _CategoryDropDownWidgetState extends State<CategoryDropDownWidget> {
-  Categories? defaultValue;
+  FormCategory? defaultValue;
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(categoryList.toString());
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: DropdownButtonFormField<Categories>(
+      child: DropdownButtonFormField<FormCategory>(
         value: defaultValue,
         decoration: const InputDecoration(
           label: Text('Alan Veri Kategorisi'),
@@ -26,14 +28,18 @@ class _CategoryDropDownWidgetState extends State<CategoryDropDownWidget> {
         isExpanded: false,
         menuMaxHeight: 200,
         items: categoryList
-            .map<DropdownMenuItem<Categories>>(
-              (e) => DropdownMenuItem<Categories>(
+            .map<DropdownMenuItem<FormCategory>>(
+              (e) => DropdownMenuItem<FormCategory>(
                 value: e,
                 child: Text(e.categoryName),
               ),
             )
             .toList(),
         onChanged: (value) {
+          if (value != null) {
+            widget.onChanged(value);
+          }
+
           setState(() {
             defaultValue = value;
           });

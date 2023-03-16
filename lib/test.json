@@ -1,0 +1,22 @@
+{
+    "customFormList": [
+        {
+            "id":1,
+            "description":"...",
+            "categoryId":2,
+            "areaName":"Alan ismi",
+            "type":1,
+            "optionList": null,
+            "isRequired": 1
+        },
+        {
+            "id":2,
+            "description":"...",
+            "categoryId":2,
+            "areaName":"Alan ismi",
+            "type":2,
+            "optionList": null,
+            "isRequired": 1
+        }
+    ]
+}

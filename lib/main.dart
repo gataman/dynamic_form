@@ -22,7 +22,10 @@ class MainApp extends StatelessWidget {
   ThemeData _getTheme() => ThemeData(
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-              shape: const RoundedRectangleBorder(side: BorderSide(color: Colors.black)),
+              shape: RoundedRectangleBorder(
+                side: const BorderSide(color: Colors.black),
+                borderRadius: BorderRadius.circular(5),
+              ),
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8)),

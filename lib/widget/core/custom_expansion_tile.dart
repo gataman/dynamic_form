@@ -1,16 +1,22 @@
-import 'package:dynamic_form/constants.dart';
-import 'package:dynamic_form/enums/custom_form_types.dart';
-import 'package:dynamic_form/model/custom_form.dart';
-import 'package:dynamic_form/widget/products/form_types_drop_down_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../../enums/custom_form_types.dart';
+import '../../extensions/iterable_extensions.dart';
+import '../../model/custom_form.dart';
+import '../../model/form_options.dart';
 import '../products/category_drop_down_widget.dart';
+import '../products/form_types_drop_down_widget.dart';
 import 'custom_text_form_field.dart';
 import 'option_text_form_field.dart';
 
 class CustomExpansionTile extends StatefulWidget {
-  const CustomExpansionTile({super.key, required this.customForm});
+  const CustomExpansionTile({
+    super.key,
+    required this.customForm,
+    required this.onDeleteForm,
+  });
   final CustomForm customForm;
+  final VoidCallback onDeleteForm;
 
   @override
   State<CustomExpansionTile> createState() => _CustomExpansionTileState();
@@ -19,26 +25,32 @@ class CustomExpansionTile extends StatefulWidget {
 class _CustomExpansionTileState extends State<CustomExpansionTile> {
   @override
   Widget build(BuildContext context) {
-    debugPrint('liste ${categoryList.length}');
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ExpansionTile(
         title: Row(
-          children: const [
+          children: [
             Expanded(
-              child: Text('Özel Form 01'),
+              child: Text(widget.customForm.label),
             ),
-            Icon(Icons.delete),
+            IconButton(onPressed: widget.onDeleteForm, icon: const Icon(Icons.delete)),
           ],
         ),
         children: [
           Form(
             child: Column(
               children: [
-                const CustomTextFormField(
+                CustomTextFormField(
                   label: 'Alan Tanımlayıcı  ',
+                  onChanged: (value) {
+                    widget.customForm.description = value;
+                  },
                 ),
-                const CategoryDropDownWidget(),
+                CategoryDropDownWidget(
+                  onChanged: (value) {
+                    widget.customForm.categoryId = value.id;
+                  },
+                ),
                 FormTypesDropDownWidget(
                   onChanged: (formType) {
                     setState(() {
@@ -46,9 +58,9 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
                     });
                   },
                 ),
-                _langsRow(),
+                _langsRow(), // PageView olacak veya IndexedStack
                 _OptionWidget(
-                  formType: widget.customForm.type ?? 1,
+                  customForm: widget.customForm,
                 )
               ],
             ),
@@ -74,19 +86,37 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
   }
 }
 
-class _OptionWidget extends StatelessWidget {
+// Opsiyonlar
+class _OptionWidget extends StatefulWidget {
   const _OptionWidget({
-    required this.formType,
+    required this.customForm,
   });
 
-  final int formType;
+  final CustomForm customForm;
 
+  @override
+  State<_OptionWidget> createState() => _OptionWidgetState();
+}
+
+class _OptionWidgetState extends State<_OptionWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const CustomTextFormField(label: 'Alan İsmi  '),
-        _getOptions(CustomFormTypes.values.firstWhere((element) => element.type == formType)),
+        CustomTextFormField(
+          initialValue: widget.customForm.formName,
+          label: 'Alan İsmi',
+          onChanged: (value) {
+            widget.customForm.formName = value;
+          },
+        ),
+        _getOptions(CustomFormTypes.values.firstWhere((element) => element.type == widget.customForm.type)),
+        TextButton.icon(
+            onPressed: () {
+              _addOption();
+            },
+            icon: Icon(Icons.add),
+            label: Text('Opsiyon Ekle'))
       ],
     );
   }
@@ -105,7 +135,28 @@ class _OptionWidget extends StatelessWidget {
   }
 
   Widget _singleOptional() {
-    return OptionTextFormField(label: 'A Seçeneği ');
+    if (widget.customForm.optionList != null && widget.customForm.optionList!.isNotEmpty) {
+      return Column(
+        children: widget.customForm.optionList!
+            .map((option) => OptionTextFormField(
+                  formOption: option,
+                  onChanged: (value) {
+                    option.value = value;
+                  },
+                  onDeleteOption: () {
+                    _deleteOption(option);
+                  },
+                  onChecked: (value) {
+                    setState(() {
+                      option.isChecked = value;
+                    });
+                  },
+                ))
+            .toList(),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _multiOptional() {
@@ -118,5 +169,31 @@ class _OptionWidget extends StatelessWidget {
 
   Widget _multiLine() {
     return const Text('Multi Line');
+  }
+
+  void _addOption() {
+    setState(() {
+      widget.customForm.optionList ??= [];
+      final index = widget.customForm.optionList!.length + 1;
+      widget.customForm.optionList!.add(FormOption(
+        label: 'Opsiyon $index',
+      ));
+    });
+  }
+
+  void _deleteOption(FormOption formOptions) {
+    setState(() {
+      widget.customForm.optionList?.remove(formOptions);
+      _setOptionsIndex();
+    });
+  }
+
+  void _setOptionsIndex() {
+    setState(() {
+      widget.customForm.optionList?.forEachIndexed((index, element) {
+        element.index = index + 1;
+        element.label = 'Opsiyon ${index + 1}';
+      });
+    });
   }
 }

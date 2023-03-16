@@ -1,8 +1,7 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-class Categories {
+class FormCategory {
   int id;
   String categoryName;
-  Categories({
+  FormCategory({
     required this.id,
     required this.categoryName,
   });

@@ -1,6 +1,6 @@
 import 'package:dynamic_form/constants.dart';
 import 'package:dynamic_form/enums/custom_form_types.dart';
-import 'package:dynamic_form/model/categiories.dart';
+import 'package:dynamic_form/model/form_category.dart';
 import 'package:flutter/material.dart';
 
 class FormTypesDropDownWidget extends StatefulWidget {

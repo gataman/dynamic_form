@@ -1,3 +1,4 @@
+import 'package:dynamic_form/extensions/iterable_extensions.dart';
 import 'package:flutter/material.dart';
 
 import 'model/custom_form.dart';
@@ -27,19 +28,47 @@ class _FormViewState extends State<FormView> {
   }
 
   Padding _title() {
-    return const Padding(
-      padding: EdgeInsets.all(8.0),
-      child: Text('Özel Form Alanı'),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          const Expanded(child: Text('Özel Form Alanı')),
+          ElevatedButton(
+              onPressed: () {
+                debugPrint(customFormList.toString());
+              },
+              child: const Text('Kaydet'))
+        ],
+      ),
     );
   }
 
+  // Özel form list view
+  Widget _listView() {
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        final customForm = customFormList[index];
+        return CustomExpansionTile(
+          customForm: customForm,
+          onDeleteForm: () {
+            _deleteForm(customForm);
+          },
+        );
+      },
+      itemCount: customFormList.length,
+    );
+  }
+
+  // Yeni özel form ekleme
   Widget _addButton() {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: ElevatedButton.icon(
         onPressed: () {
           setState(() {
-            customFormList.add(CustomForm(id: customFormList.length));
+            final count = customFormList.length + 1;
+            final String label = count < 10 ? 'Özel Form 0$count' : 'Özel Form $count';
+            customFormList.add(CustomForm(label: label));
           });
         },
         icon: const Icon(Icons.add),
@@ -48,14 +77,20 @@ class _FormViewState extends State<FormView> {
     );
   }
 
-  Widget _listView() {
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        return CustomExpansionTile(
-          customForm: customFormList[index],
-        );
-      },
-      itemCount: customFormList.length,
-    );
+  void _deleteForm(CustomForm customForm) {
+    setState(() {
+      customFormList.remove(customForm);
+      _setFormName();
+    });
+  }
+
+  // Özel form alanı silindiğinde isimlendirmedeki 01, 02... vb değişecekse diye eklendi.
+  void _setFormName() {
+    customFormList.forEachIndexed((index, element) {
+      final count = index + 1;
+      String label = count < 10 ? 'Özel Form 0$count' : 'Özel Form $count';
+
+      element.label = label;
+    });
   }
 }
