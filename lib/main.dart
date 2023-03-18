@@ -13,9 +13,17 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: _getTheme(),
-      home: const Scaffold(
-        body: FormView(),
-      ),
+      home: Scaffold(
+          body: Column(children: [
+        Expanded(
+          child: Stepper(steps: const [
+            Step(
+              title: Text('Step 1'),
+              content: FormView(),
+            )
+          ]),
+        ),
+      ])),
     );
   }
 

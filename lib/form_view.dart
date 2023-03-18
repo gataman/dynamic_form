@@ -17,13 +17,15 @@ class _FormViewState extends State<FormView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (customFormList.isNotEmpty) _title(),
-        if (customFormList.isNotEmpty) Expanded(child: _listView()),
-        _addButton(),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (customFormList.isNotEmpty) _title(),
+          if (customFormList.isNotEmpty) _listView(),
+          _addButton(),
+        ],
+      ),
     );
   }
 
@@ -46,6 +48,8 @@ class _FormViewState extends State<FormView> {
   // Özel form list view
   Widget _listView() {
     return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         final customForm = customFormList[index];
         return CustomExpansionTile(
